@@ -1,0 +1,103 @@
+<section class="reports-list">
+  <app-navbar
+    mode="private"
+    [userRole]="userRole"
+    (toggleSidebar)="toggleSidebar()"
+  ></app-navbar>
+
+  <mat-drawer-container class="reports-list__drawer-container" autosize>
+    <mat-drawer
+      class="reports-list__drawer"
+      mode="over"
+      position="start"
+      [opened]="drawerOpen"
+      (closedStart)="drawerOpen = false"
+    >
+      <app-left-sidebar
+        [userRole]="userRole"
+        (closeSidebar)="closeSidebar()"
+      ></app-left-sidebar>
+    </mat-drawer>
+
+    <mat-drawer-content class="reports-list__content">
+      <div class="reports-list__main">
+        <main class="reports-list__body">
+
+          <section class="reports-list__hero">
+            <div>
+              <h1 class="reports-list__title">Reportes</h1>
+              <p class="reports-list__subtitle">
+                Gestiona los reportes de la plataforma
+              </p>
+            </div>
+          </section>
+
+          <section class="reports-list__table">
+            <mat-card class="reports-list__card">
+              <mat-card-content>
+
+                <div class="reports-list__table-wrapper">
+                  <table class="reports-list__table-content">
+                    <thead>
+                      <tr>
+                        <th>Motivo</th>
+                        <th>Usuario</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      @for (report of reports; track report.id) {
+                        <tr>
+                          <td>{{ report.motivo }}</td>
+                          <td>{{ report.usuario }}</td>
+                          <td>{{ report.fecha }}</td>
+
+                          <td>
+                            <span
+                              class="reports-list__status"
+                              [class.pending]="report.estado === 'PENDIENTE'"
+                              [class.approved]="report.estado === 'APROBADO'"
+                              [class.rejected]="report.estado === 'RECHAZADO'"
+                            >
+                              {{ report.estado }}
+                            </span>
+                          </td>
+
+                          <td class="reports-list__actions">
+                              <button mat-stroked-button type="button" (click)="verDetalle(report.id)">
+                               Ver
+                              </button>
+
+                            @if (canManageReports) {
+                              <button mat-stroked-button color="primary"
+                                (click)="cambiarEstado(report, 'APROBADO')">
+                                Aprobar
+                              </button>
+
+                              <button mat-stroked-button color="warn"
+                                (click)="cambiarEstado(report, 'RECHAZADO')">
+                                Rechazar
+                              </button>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+
+                  </table>
+                </div>
+
+              </mat-card-content>
+            </mat-card>
+          </section>
+
+        </main>
+
+        <app-footer></app-footer>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</section>

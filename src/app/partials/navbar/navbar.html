@@ -1,38 +1,98 @@
 <mat-toolbar color="primary" class="navbar px-4">
+  <section class="brand-container" aria-label="Barra principal">
+    @if (isPrivate) {
+      <button
+        mat-icon-button
+        type="button"
+        class="menu-btn"
+        (click)="onToggleSidebar()"
+        aria-label="Abrir menú"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+    }
 
-  <!-- Izquierda -->
-  <section class="brand-container" routerLink="/" aria-label="Ir a inicio">
-    <!-- Aquí va el logo en la parte superior izquierda -->
-    <a routerLink="/" class="brand-logo-link" aria-label="Ir a inicio">
-      <img src="assets/images/logo-blanco.png" alt="Logo CampusForum" class="brand-logo" />
-    </a>
+    @if (isPublic) {
+      <a
+        type="button"
+        (click)="goToInicio()"
+        class="brand-logo-link"
+        aria-label="Ir a inicio"
+      >
+        <img
+          src="assets/images/logo-blanco.png"
+          alt="Logo CampusForum"
+          class="brand-logo"
+        />
+      </a>
+    }
 
-    <!-- Marca con estilo integrado naturaleza de única palabra -->
     <a routerLink="/" class="brand-text">
       <span class="brand-campus">CAMPUS</span>
       <span class="brand-forum">FORUM</span>
     </a>
   </section>
 
-  <!-- Centro -->
-  <section class="d-none d-md-flex gap-4">
-    <a mat-button routerLink="/">Inicio</a>
-    <a mat-button routerLink="/proposito">Propósito</a>
-  </section>
+  @if (isPublic || isPrivate) {
+    <section class="navbar__links d-none d-md-flex gap-4">
+      <a mat-button type="button" (click)="goToInicio()">Inicio</a>
+      <button
+        mat-button
+        type="button"
+        (click)="goToProposito()"
+        class="nav-link-btn"
+      >
+        Propósito
+      </button>
+    </section>
+  }
 
-  <!-- Derecha -->
-  <section class="d-flex align-items-center gap-2 ms-4">
+  @if (isPublic) {
+    <section class="navbar__actions navbar__actions--public d-flex align-items-center gap-2 ms-4">
+      <button
+        mat-button
+        type="button"
+        (click)="goToLogin()"
+        class="d-flex align-items-center gap-1 login-btn"
+      >
+        <i class="bi bi-box-arrow-in-right"></i>
+        <span>Login</span>
+      </button>
 
-    <button mat-button routerLink="/login" class="d-flex align-items-center gap-1 login-btn">
-      <i class="bi bi-box-arrow-in-right"></i>
-      Login
-    </button>
+      <button
+        mat-raised-button
+        type="button"
+        (click)="goToRegistro()"
+        class="register-btn"
+      >
+        <i class="bi bi-person-plus"></i>
+        <span>Registro</span>
+      </button>
+    </section>
+  }
 
-    <button mat-raised-button routerLink="/registro" class="register-btn">
-      <i class="bi bi-person-plus"></i>
-      Registro
-    </button>
+  @if (isPrivate) {
+    <section class="navbar__actions navbar__actions--private d-flex align-items-center gap-2 ms-4">
+      <button
+        mat-button
+        type="button"
+        class="d-flex align-items-center gap-1 login-btn"
+        (click)="goToProfile()"
+      >
+        <i class="bi bi-person-circle"></i>
+        <span>Perfil</span>
+      </button>
 
-  </section>
-
+      <button
+        mat-stroked-button
+        type="button"
+        class="d-flex align-items-center gap-1 logout-btn"
+        (click)="logout()"
+        aria-label="Cerrar sesión"
+      >
+        <i class="bi bi-box-arrow-right"></i>
+        <span class="logout-btn__text">Cerrar sesión</span>
+      </button>
+    </section>
+  }
 </mat-toolbar>

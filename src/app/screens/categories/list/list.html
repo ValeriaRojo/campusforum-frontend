@@ -1,0 +1,99 @@
+<section class="categories-list">
+  <app-navbar
+    mode="private"
+    [userRole]="userRole"
+    (toggleSidebar)="toggleSidebar()"
+  ></app-navbar>
+
+  <mat-drawer-container class="categories-list__drawer-container" autosize>
+    <mat-drawer
+      class="categories-list__drawer"
+      mode="over"
+      position="start"
+      [opened]="drawerOpen"
+      (closedStart)="drawerOpen = false"
+    >
+      <app-left-sidebar
+        [userRole]="userRole"
+        (closeSidebar)="closeSidebar()"
+      ></app-left-sidebar>
+    </mat-drawer>
+
+    <mat-drawer-content class="categories-list__content">
+      <div class="categories-list__main">
+        <main class="categories-list__body">
+          <section class="categories-list__hero">
+            <div class="categories-list__hero-copy">
+              <h1 class="categories-list__title">Categorías</h1>
+              <p class="categories-list__subtitle">Gestiona las categorías académicas</p>
+            </div>
+
+            @if (canManageCategories) {
+              <button mat-flat-button type="button" (click)="goCreateCategory()">
+                <mat-icon>add</mat-icon>
+                Nueva categoría
+              </button>
+            }
+          </section>
+
+          <section class="categories-list__table">
+            <mat-card class="categories-list__table-card">
+              <mat-card-content>
+                <div class="categories-list__table-wrapper">
+                  <table class="categories-list__table-content">
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>Estado</th>
+                        <th>Publicaciones</th>
+                        @if (canManageCategories) {
+                          <th>Acciones</th>
+                        }
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      @for (category of categories; track category.id) {
+                        <tr>
+                          <td class="categories-list__name-cell">
+                            {{ category.nombre }}
+                          </td>
+
+                          <td>
+                            <span
+                              class="categories-list__status"
+                              [class.active]="category.estado === 'ACTIVA'"
+                              [class.inactive]="category.estado === 'INACTIVA'"
+                            >
+                              {{ category.estado }}
+                            </span>
+                          </td>
+
+                          <td>{{ category.totalPosts }}</td>
+
+                          @if (canManageCategories) {
+                            <td class="categories-list__actions-col">
+                              <button mat-stroked-button type="button" (click)="goEditCategory(category.id)">
+                                Editar
+                              </button>
+
+                              <button mat-stroked-button type="button" color="warn" (click)="eliminarCategoria(category)">
+                                Eliminar
+                              </button>
+                            </td>
+                          }
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </section>
+        </main>
+
+        <app-footer></app-footer>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</section>

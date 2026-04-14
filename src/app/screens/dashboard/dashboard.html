@@ -1,0 +1,185 @@
+<section class="dashboard">
+  <app-navbar
+    mode="private"
+    [userRole]="userRole"
+    (toggleSidebar)="toggleSidebar()"
+  ></app-navbar>
+
+  <mat-drawer-container class="dashboard__drawer-container" autosize>
+    <mat-drawer
+      class="dashboard__drawer"
+      mode="over"
+      position="start"
+      [opened]="drawerOpen"
+      (closedStart)="drawerOpen = false"
+    >
+      <app-left-sidebar
+        [userRole]="userRole"
+        (closeSidebar)="closeSidebar()"
+      ></app-left-sidebar>
+    </mat-drawer>
+
+    <mat-drawer-content class="dashboard__drawer-content">
+      <div class="dashboard__main">
+        <div class="dashboard__content">
+          <main class="dashboard__body">
+
+            <section class="dashboard__hero">
+              <mat-card class="dashboard__hero-card">
+                <mat-card-content>
+                  <div class="dashboard__hero-grid">
+                    <div class="dashboard__hero-copy">
+                      <span class="dashboard__eyebrow">Panel principal</span>
+                      <h2>Dashboard</h2>
+                      <p class="dashboard__hero-text">
+                        Consulta la actividad general de CampusForum y accede rápidamente
+                        a los módulos principales según tu rol.
+                      </p>
+
+                      <div class="dashboard__role-wrap">
+                        <span class="dashboard__role-label">Rol actual</span>
+                        <span class="dashboard__role-pill">{{ userRole }}</span>
+                      </div>
+                    </div>
+
+                    <div class="dashboard__hero-stats">
+                      <div class="dashboard__stat">
+                        <span class="dashboard__stat-label">Tendencia principal</span>
+                        <strong class="dashboard__stat-value">{{ tendenciasCards[0].value }}</strong>
+                      </div>
+
+                      <div class="dashboard__stat">
+                        <span class="dashboard__stat-label">Acceso activo</span>
+                        <strong class="dashboard__stat-value">
+                          {{ isAdministrador ? 'Administración' : (isProfesor ? 'Moderación' : 'Exploración') }}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </section>
+
+            <section class="dashboard__section">
+              <div class="dashboard__section-head">
+                <div>
+                  <h3>Tendencias</h3>
+                  <p>Categorías más comentadas por los usuarios</p>
+                </div>
+              </div>
+
+              <section class="dashboard__cards">
+                @for (item of tendenciasCards; track item.title) {
+                  <mat-card class="dashboard__card dashboard__card--trend">
+                    <mat-card-content>
+                      <span class="dashboard__card-badge">Tendencia</span>
+                      <p class="dashboard__card-label">{{ item.title }}</p>
+                      <h3 class="dashboard__card-value">{{ item.value }}</h3>
+                    </mat-card-content>
+                  </mat-card>
+                }
+              </section>
+            </section>
+
+            @if (isProfesorOrAdmin) {
+              <section class="dashboard__section">
+                <div class="dashboard__section-head">
+                  <div>
+                    <h3>Número de publicaciones por categoría</h3>
+                    <p>Resumen de actividad por categoría académica</p>
+                  </div>
+                </div>
+
+                <section class="dashboard__cards">
+                  @for (item of publicacionesPorCategoria; track item.title) {
+                    <mat-card class="dashboard__card dashboard__card--category">
+                      <mat-card-content>
+                        <span class="dashboard__card-badge dashboard__card-badge--soft">Categoría</span>
+                        <p class="dashboard__card-label">{{ item.title }}</p>
+                        <h3 class="dashboard__card-value">{{ item.value }}</h3>
+                      </mat-card-content>
+                    </mat-card>
+                  }
+                </section>
+              </section>
+
+              <section class="dashboard__section">
+                <div class="dashboard__section-head">
+                  <div>
+                    <h3>Top posters</h3>
+                    <p>Usuarios con mayor actividad dentro del sistema</p>
+                  </div>
+                </div>
+
+                <section class="dashboard__cards">
+                  @for (item of topPosters; track item.title) {
+                    <mat-card class="dashboard__card dashboard__card--poster">
+                      <mat-card-content>
+                        <span class="dashboard__card-badge dashboard__card-badge--success">Usuario destacado</span>
+                        <p class="dashboard__card-label">{{ item.title }}</p>
+                        <h3 class="dashboard__card-value">{{ item.value }}</h3>
+                      </mat-card-content>
+                    </mat-card>
+                  }
+                </section>
+              </section>
+
+              <section class="dashboard__panel">
+                <mat-card class="dashboard__panel-card">
+                  <mat-card-content>
+                    <div class="dashboard__panel-head">
+                      <div>
+                        <h3>Accesos rápidos</h3>
+                        <p>Ingresa rápidamente a las vistas principales del sistema</p>
+                      </div>
+                    </div>
+
+                    <div class="dashboard__actions">
+                      <button mat-stroked-button type="button" class="dashboard__action-btn" (click)="goToPosts()">
+                        Publicaciones
+                      </button>
+
+                      <button mat-stroked-button type="button" class="dashboard__action-btn" (click)="goToCategories()">
+                        Categorías
+                      </button>
+
+                      @if (isAdministrador) {
+                        <button mat-stroked-button type="button" class="dashboard__action-btn" (click)="goToReports()">
+                          Reportes
+                        </button>
+                      }
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </section>
+            }
+
+            @if (isEstudiante) {
+              <section class="dashboard__panel">
+                <mat-card class="dashboard__panel-card">
+                  <mat-card-content>
+                    <div class="dashboard__panel-head">
+                      <div>
+                        <h3>Acceso principal</h3>
+                        <p>Explora publicaciones y mantente al día con la actividad reciente</p>
+                      </div>
+                    </div>
+
+                    <div class="dashboard__actions">
+                      <button mat-stroked-button type="button" class="dashboard__action-btn" (click)="goToPosts()">
+                        Ver publicaciones
+                      </button>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </section>
+            }
+
+          </main>
+        </div>
+
+        <app-footer></app-footer>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</section>

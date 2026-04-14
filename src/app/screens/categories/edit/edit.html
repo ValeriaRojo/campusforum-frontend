@@ -1,0 +1,84 @@
+<section class="categories-edit">
+  <app-navbar
+    mode="private"
+    [userRole]="userRole"
+    (toggleSidebar)="toggleSidebar()"
+  ></app-navbar>
+
+  <mat-drawer-container class="categories-edit__drawer-container" autosize>
+    <mat-drawer
+      class="categories-edit__drawer"
+      mode="over"
+      position="start"
+      [opened]="drawerOpen"
+      (closedStart)="drawerOpen = false"
+    >
+      <app-left-sidebar
+        [userRole]="userRole"
+        (closeSidebar)="closeSidebar()"
+      ></app-left-sidebar>
+    </mat-drawer>
+
+    <mat-drawer-content class="categories-edit__content">
+      <div class="categories-edit__main">
+        <main class="categories-edit__body">
+          <section class="categories-edit__hero">
+            <div class="categories-edit__hero-copy">
+              <h1 class="categories-edit__title">Editar categoría</h1>
+              <p class="categories-edit__subtitle">Actualiza la información de la categoría</p>
+            </div>
+
+            <button mat-stroked-button type="button" (click)="goBack()">
+              <mat-icon>arrow_back</mat-icon>
+              Volver a categorías
+            </button>
+          </section>
+
+            <section class="categories-edit__form-section">
+              <mat-card class="categories-edit__card">
+                <mat-card-content>
+                  <h2 class="categories-edit__form-title">Formulario de edición</h2>
+
+                  <mat-form-field class="categories-edit__field" appearance="outline">
+                    <mat-label>Nombre de la categoría</mat-label>
+                    <input
+                      [(ngModel)]="categoria.nombre"
+                      type="text"
+                      matInput
+                      placeholder="Escribe el nombre de la categoría"
+                    >
+                  </mat-form-field>
+                  @if (errors.nombre) {
+                    <div class="categories-edit__error">{{ errors.nombre }}</div>
+                  }
+
+                  <mat-form-field class="categories-edit__field" appearance="outline">
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="categoria.estado" placeholder="Selecciona el estado">
+                      <mat-option value="ACTIVA">Activa</mat-option>
+                      <mat-option value="INACTIVA">Inactiva</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  @if (errors.estado) {
+                    <div class="categories-edit__error">{{ errors.estado }}</div>
+                  }
+
+                  <div class="categories-edit__actions">
+                    <button mat-stroked-button type="button" (click)="goBack()">
+                      Cancelar
+                    </button>
+
+                    <button mat-flat-button type="button" (click)="guardarCambios()">
+                      Guardar cambios
+                    </button>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </section>
+        </main>
+
+        <app-footer></app-footer>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</section>
