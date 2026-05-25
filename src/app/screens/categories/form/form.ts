@@ -5,10 +5,9 @@ import { Navbar } from '../../../partials/navbar/navbar';
 import { Sidebar } from '../../../partials/sidebar/sidebar';
 import { Footer } from '../../../partials/footer/footer';
 import { AuthService } from '../../../services/auth.service';
-import {CategoriesService} from '../../../services/categorias-service';
+import { CategoriesService } from '../../../services/categorias-service';
 import { CategoryErrors, CategoryForm } from '../../../shared/interfaces/categories.interface';
 import { UserRole } from '../../../models/auth-user.model';
-
 
 @Component({
   selector: 'app-categories-form',
@@ -32,35 +31,14 @@ export class CategoriesForm implements OnInit {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly authService: AuthService,
-    private readonly categoriesService: CategoriesService,
+    private readonly categoriesService: CategoriesService
   ) {
     this.form = this.categoriesService.esquemaCategoria();
   }
 
   ngOnInit(): void {
-    this.isLogin = this.authService.isAuthenticated();
-    this.userRole = this.authService.getUserRole() ?? 'ESTUDIANTE';
-
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (!idParam) {
-      return;
-    }
-
-    this.isEditMode = true;
-    this.categoryId = Number(idParam);
-
-    const found = this.categoriesService.getCategoryById(this.categoryId);
-    if (!found) {
-      this.router.navigate(['/categories']);
-      return;
-    }
-
-    this.form = {
-      id: found.id,
-      nombre: found.nombre,
-      descripcion: found.descripcion,
-      estado: found.estado,
-    };
+    this.syncAuthState();
+    this.resolveMode();
   }
 
   public toggleSidebar(): void {
@@ -80,20 +58,55 @@ export class CategoriesForm implements OnInit {
 
     if (this.isEditMode && this.categoryId) {
       const result = this.categoriesService.updateCategory(this.categoryId, this.form);
+
       if (!result.ok) {
         this.errors = result.errors;
         return;
       }
+
       this.router.navigate(['/categories']);
       return;
     }
 
     const result = this.categoriesService.createCategory(this.form);
+
     if (!result.ok) {
       this.errors = result.errors;
       return;
     }
 
     this.router.navigate(['/categories']);
+  }
+
+  private syncAuthState(): void {
+    this.isLogin = this.authService.isAuthenticated();
+    this.userRole = this.authService.getUserRole() ?? 'ESTUDIANTE';
+  }
+
+  private resolveMode(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+
+    if (!idParam) {
+      this.isEditMode = false;
+      this.categoryId = null;
+      return;
+    }
+
+    this.isEditMode = true;
+    this.categoryId = Number(idParam);
+
+    const found = this.categoriesService.getCategoryById(this.categoryId);
+
+    if (!found) {
+      this.router.navigate(['/categories']);
+      return;
+    }
+
+    this.form = {
+      id: found.id,
+      nombre: found.nombre,
+      descripcion: found.descripcion,
+      estado: found.estado,
+    };
   }
 }

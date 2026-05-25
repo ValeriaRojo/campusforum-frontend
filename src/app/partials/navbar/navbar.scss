@@ -1,7 +1,6 @@
 :host {
   display: block;
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 1200;
 }
 
@@ -17,6 +16,19 @@
   top: 0;
   z-index: 1200;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.navbar--public {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 5000;
+}
+
+.navbar-public-spacer {
+  height: 85px;
 }
 
 .mat-toolbar {
@@ -36,8 +48,24 @@
 .brand-logo-link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   margin-right: 0.4rem;
   flex-shrink: 0;
+  border: 0 !important;
+  outline: none;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  appearance: none;
+}
+
+.brand-logo-link:focus,
+.brand-logo-link:active {
+  outline: none;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .brand-logo {
@@ -45,6 +73,7 @@
   height: 65px;
   border-radius: 50px;
   object-fit: contain;
+  display: block;
 }
 
 .brand-text {
@@ -81,29 +110,37 @@
 }
 
 .navbar__links {
+  display: flex;
   align-items: center;
+  gap: 0.35rem;
 }
 
 .navbar__actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.nav-link-btn {
+  color: white !important;
+  font-weight: 500 !important;
 }
 
 .register-btn {
-  background-color: var(--secondary-color);
-  color: white;
-  border-radius: 20px;
+  background-color: var(--secondary-color) !important;
+  color: white !important;
+  border-radius: 20px !important;
 }
 
 .register-btn:hover {
-  background-color: var(--secondary-dark);
-  color: white;
+  background-color: var(--secondary-dark) !important;
+  color: white !important;
 }
 
 .login-btn {
   color: white !important;
-  border-radius: var(--border-radius);
+  border-radius: var(--border-radius) !important;
 }
 
 .login-btn:hover {
@@ -129,6 +166,10 @@ button[mat-button] {
 .navbar-profile-btn {
   color: white !important;
   font-weight: 500;
+}
+
+.navbar-profile-btn mat-icon {
+  margin-right: 5px;
 }
 
 .logout-btn {
@@ -189,6 +230,10 @@ button[mat-button] {
     padding-bottom: 0.65rem;
   }
 
+  .navbar-public-spacer {
+    height: 72px;
+  }
+
   .navbar {
     gap: 0.75rem;
     align-items: center;
@@ -218,6 +263,10 @@ button[mat-button] {
   .brand-campus,
   .brand-forum {
     font-size: 0.95rem;
+  }
+
+  .navbar__links {
+    display: none;
   }
 
   .navbar__actions {

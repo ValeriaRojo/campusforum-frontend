@@ -54,23 +54,18 @@
   color: #0b5cc6;
 }
 
-.left-sidebar__bottom {
-  margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid #e5e7eb;
-  flex-shrink: 0;
-}
+@media (max-width: 767.98px) {
+  .left-sidebar {
+    padding: 14px;
+  }
 
-.left-sidebar__bottom button[mat-stroked-button] {
-  width: 100%;
-  min-height: 46px;
-  border-radius: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
+  .left-sidebar__nav {
+    gap: 8px;
+  }
 
-.left-sidebar__bottom button[mat-stroked-button] mat-icon {
-  margin-right: 0;
+  .left-sidebar__nav button[mat-button] {
+    min-height: 44px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+  }
 }

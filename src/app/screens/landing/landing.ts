@@ -1,8 +1,8 @@
 import { Component, AfterViewInit, Input, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
 import { Navbar } from '../../partials/navbar/navbar';
 import { Footer } from '../../partials/footer/footer';
-import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PostsService, PostListItem } from '../../services/posts-service';
 import { CategoriesService } from '../../services/categorias-service';
@@ -42,6 +42,7 @@ export class Landing implements OnInit, AfterViewInit {
   public categoriasAcademicas: CategoryItem[] = [];
 
   constructor(
+    private readonly router: Router,
     private readonly postsService: PostsService,
     private readonly categoriesService: CategoriesService,
   ) {}
@@ -77,6 +78,14 @@ export class Landing implements OnInit, AfterViewInit {
     );
 
     document.querySelectorAll('.fade-in').forEach((el) => observador.observe(el));
+  }
+
+  public goPostFromLanding(postId: number): void {
+    this.router.navigate(['/login'], {
+      queryParams: {
+        redirectTo: `/posts/${postId}`,
+      },
+    });
   }
 
   public getCategoriaTexto(nombre: string): string {

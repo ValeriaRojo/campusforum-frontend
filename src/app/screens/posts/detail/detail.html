@@ -24,13 +24,14 @@
     <mat-drawer-content class="posts-detail__content">
       <div class="posts-detail__main">
         <main class="posts-detail__body">
-
           <section class="posts-detail__hero">
             <div class="posts-detail__hero-copy">
               <span class="posts-detail__eyebrow">Detalle de publicación</span>
+
               <h1 class="posts-detail__title">
                 {{ post?.titulo || 'Publicación' }}
               </h1>
+
               <p class="posts-detail__subtitle">
                 Consulta el contenido completo y participa en la discusión mediante comentarios.
               </p>
@@ -44,22 +45,28 @@
 
           @if (post) {
             <section class="posts-detail__layout">
-
               <div class="posts-detail__primary">
                 <mat-card class="posts-detail__card">
                   <mat-card-content>
-
                     <div class="posts-detail__head">
                       <div class="posts-detail__head-main">
                         <div class="posts-detail__meta-top">
-                          <span class="posts-detail__category">{{ categoriaNombre }}</span>
-                          <span class="posts-detail__status" [ngClass]="getEstadoClase(post.estado)">
+                          <span class="posts-detail__category">
+                            {{ categoriaNombre }}
+                          </span>
+
+                          <span
+                            class="posts-detail__status"
+                            [ngClass]="getEstadoClase(post.estado)"
+                          >
                             {{ post.estado }}
                           </span>
                         </div>
 
                         <div class="posts-detail__author-line">
-                          <span class="posts-detail__avatar">{{ post.autor.charAt(0) }}</span>
+                          <span class="posts-detail__avatar">
+                            {{ post.autor.charAt(0) }}
+                          </span>
 
                           <div class="posts-detail__author-copy">
                             <strong>{{ post.autor }}</strong>
@@ -91,9 +98,10 @@
                     </div>
 
                     <div class="posts-detail__content-block">
-                      <p class="posts-detail__content-text">
-                        {{ post.contenido }}
-                      </p>
+                      <div
+                        class="posts-detail__content-text"
+                        [innerHTML]="post.contenido"
+                      ></div>
                     </div>
 
                     @if (getTags().length > 0) {
@@ -103,7 +111,6 @@
                         }
                       </div>
                     }
-
                   </mat-card-content>
                 </mat-card>
 
@@ -143,7 +150,10 @@
                     <div class="posts-detail__comments-head">
                       <div>
                         <h2>Comentarios</h2>
-                        <p>{{ post.comentarios.length }} comentario{{ post.comentarios.length === 1 ? '' : 's' }}</p>
+                        <p>
+                          {{ post.comentarios.length }}
+                          comentario{{ post.comentarios.length === 1 ? '' : 's' }}
+                        </p>
                       </div>
                     </div>
 
@@ -164,6 +174,17 @@
                               </div>
 
                               <div class="posts-detail__comment-controls">
+                                @if (canEditComment(comment)) {
+                                  <button
+                                    mat-icon-button
+                                    type="button"
+                                    (click)="startEditComment(comment)"
+                                    aria-label="Editar comentario"
+                                  >
+                                    <mat-icon>edit</mat-icon>
+                                  </button>
+                                }
+
                                 @if (canDeleteComment(comment)) {
                                   <button
                                     mat-icon-button
@@ -188,9 +209,42 @@
                               </div>
                             </div>
 
-                            <p class="posts-detail__comment-text">
-                              {{ comment.contenido }}
-                            </p>
+                            @if (editingCommentId === comment.id) {
+                              <div class="posts-detail__comment-edit">
+                                <mat-form-field
+                                  appearance="outline"
+                                  class="posts-detail__comment-edit-field"
+                                >
+                                  <mat-label>Editar comentario</mat-label>
+                                  <textarea
+                                    matInput
+                                    rows="4"
+                                    [(ngModel)]="editingCommentText"
+                                    name="editingCommentText"
+                                  ></textarea>
+                                </mat-form-field>
+
+                                @if (editingCommentError) {
+                                  <div class="posts-detail__error">
+                                    {{ editingCommentError }}
+                                  </div>
+                                }
+
+                                <div class="posts-detail__comment-edit-actions">
+                                  <button mat-button type="button" (click)="cancelEditComment()">
+                                    Cancelar
+                                  </button>
+
+                                  <button mat-flat-button type="button" (click)="saveEditedComment(comment)">
+                                    Guardar comentario
+                                  </button>
+                                </div>
+                              </div>
+                            } @else {
+                              <p class="posts-detail__comment-text">
+                                {{ comment.contenido }}
+                              </p>
+                            }
                           </article>
                         }
                       </div>
@@ -230,10 +284,8 @@
                   </mat-card-content>
                 </mat-card>
               </aside>
-
             </section>
           }
-
         </main>
 
         <app-footer></app-footer>

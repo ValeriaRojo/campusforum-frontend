@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 export type ModerationDecision = 'APROBADO' | 'RECHAZADO' | 'ARCHIVADO';
 
 export interface ModerationActionModalData {
-  targetType: 'POST' | 'COMMENT';
+  targetType: 'POST' | 'COMENTARIO';
   contenidoResumen: string;
   autorContenido: string;
   motivo: string;
@@ -21,12 +21,7 @@ export interface ModerationActionModalResult {
 @Component({
   selector: 'app-moderation-action-modal',
   standalone: true,
-  imports: [
-    FormsModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatIconModule,
-  ],
+  imports: [FormsModule, MatDialogModule, MatButtonModule, MatIconModule],
   templateUrl: './moderation-action-modal.html',
   styleUrls: ['./moderation-action-modal.scss'],
 })

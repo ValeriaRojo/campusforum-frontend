@@ -1,36 +1,76 @@
-<footer class="footer-brand">
-
-    <!-- Título del pie de página -->
+<footer class="footer-brand" [class.footer-brand--private]="mode === 'private'">
+  @if (mode === 'private') {
+    <section class="footer-brand__private">
+      <span>CampusForum</span>
+      <span>&copy; 2026. Todos los derechos reservados.</span>
+    </section>
+  } @else {
     <section class="brand-text">
-        <span class="brand-campus">CAMPUS</span>
-        <span class="brand-forum">FORUM</span>
+      <span class="brand-campus">CAMPUS</span>
+      <span class="brand-forum">FORUM</span>
     </section>
 
-    <!-- Mapa de sitio -->
     <section class="footer-map">
-        <h4 class="title-map">Mapa de Sitio</h4>
-        <section class="footer-links">
-            <a class="map-link" href="#"><i class="bi bi-house-door-fill"></i>Inicio</a>
-            <a class="map-link" href="#"><i class="bi bi-bullseye"></i>Propósito</a>
-            <a class="map-link" href="#"><i class="bi bi-grid"></i>Categorías</a>
-            <a class="map-link" href="#"><i class="bi bi-postcard-fill"></i>Publicaciones Recientes</a>
-        </section>
+      <h4 class="title-map">Mapa de Sitio</h4>
+
+      <section class="footer-links">
+<button class="map-link map-link--button" type="button" (click)="goInicio()">
+  <mat-icon>home</mat-icon>
+  Inicio
+</button>
+
+<button class="map-link map-link--button" type="button" (click)="goProposito()">
+  <mat-icon>flag</mat-icon>
+  Propósito
+</button>
+
+        <a class="map-link" routerLink="/posts">
+          <mat-icon>article</mat-icon>
+          Publicaciones Recientes
+        </a>
+
+        <a class="map-link" routerLink="/login">
+          <mat-icon>login</mat-icon>
+          Login
+        </a>
+
+        <a class="map-link" routerLink="/registro">
+          <mat-icon>person_add</mat-icon>
+          Registro
+        </a>
+      </section>
     </section>
 
-    <hr class="divider">
+    <hr class="divider" />
 
-    <!-- Redes sociales -->
     <section class="footer-socialmedia">
-        <h5 class="title-socialmedia">Síguenos en Redes Sociales</h5>
-        <div class="social-icons">
-            <a href="#" aria-label="Facebook" class="social-icon"><i class="bi bi-facebook"></i></a>
-            <a href="#" aria-label="Instagram" class="social-icon"><i class="bi bi-instagram"></i></a>
-        </div>
+      <h5 class="title-socialmedia">Síguenos en Redes Sociales</h5>
+
+      <div class="social-icons">
+        <a
+          href="https://www.facebook.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Facebook"
+          class="social-icon"
+        >
+          <mat-icon>facebook</mat-icon>
+        </a>
+
+        <a
+          href="https://www.instagram.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Instagram"
+          class="social-icon"
+        >
+          <mat-icon>photo_camera</mat-icon>
+        </a>
+      </div>
     </section>
 
-    <!-- Copyright -->
     <section class="footer-copyright">
-        <p>&copy; 2026 CampusForum. Todos los derechos reservados.</p>
+      <p>&copy; 2026 CampusForum. Todos los derechos reservados.</p>
     </section>
-
+  }
 </footer>

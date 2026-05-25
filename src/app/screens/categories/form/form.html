@@ -26,50 +26,84 @@
         <main class="categories-form__body">
           <section class="categories-form__hero">
             <div>
-              <span class="categories-form__eyebrow">Catálogo</span>
+              <span class="categories-form__eyebrow">Catálogo académico</span>
+
               <h1 class="categories-form__title">
                 {{ isEditMode ? 'Editar categoría' : 'Nueva categoría' }}
               </h1>
+
+              <p class="categories-form__subtitle">
+                {{ isEditMode
+                  ? 'Actualiza la información y disponibilidad de la categoría.'
+                  : 'Crea una categoría para organizar publicaciones académicas.' }}
+              </p>
             </div>
 
-            <button mat-stroked-button type="button" (click)="goBack()">Volver</button>
+            <button mat-stroked-button type="button" (click)="goBack()">
+              <mat-icon>arrow_back</mat-icon>
+              Volver
+            </button>
           </section>
 
           <mat-card class="categories-form__card">
             <mat-card-content>
-              <mat-form-field appearance="outline" class="full">
-                <mat-label>Nombre</mat-label>
-                <input matInput [(ngModel)]="form.nombre" name="nombre">
-              </mat-form-field>
-              @if (errors.nombre) {
-                <div class="error">{{ errors.nombre }}</div>
-              }
+              <div class="categories-form__grid">
+                <mat-form-field appearance="outline" class="full">
+                  <mat-label>Nombre</mat-label>
+                  <input
+                    matInput
+                    [(ngModel)]="form.nombre"
+                    name="nombre"
+                    maxlength="80"
+                    placeholder="Ej. Programación"
+                  />
+                </mat-form-field>
 
-              <mat-form-field appearance="outline" class="full">
-                <mat-label>Descripción</mat-label>
-                <textarea matInput rows="5" [(ngModel)]="form.descripcion" name="descripcion"></textarea>
-              </mat-form-field>
-              @if (errors.descripcion) {
-                <div class="error">{{ errors.descripcion }}</div>
-              }
+                @if (errors.nombre) {
+                  <div class="error">{{ errors.nombre }}</div>
+                }
 
-              <mat-form-field appearance="outline" class="full">
-                <mat-label>Estado</mat-label>
-                <mat-select [(ngModel)]="form.estado" name="estado">
-                  <mat-option value="ACTIVO">Activo</mat-option>
-                  <mat-option value="INACTIVO">Inactivo</mat-option>
-                </mat-select>
-              </mat-form-field>
-              @if (errors.estado) {
-                <div class="error">{{ errors.estado }}</div>
-              }
+                <mat-form-field appearance="outline" class="full">
+                  <mat-label>Descripción</mat-label>
+                  <textarea
+                    matInput
+                    rows="5"
+                    [(ngModel)]="form.descripcion"
+                    name="descripcion"
+                    maxlength="240"
+                    placeholder="Describe qué tipo de publicaciones agrupa esta categoría"
+                  ></textarea>
+                </mat-form-field>
 
-              @if (errors.general) {
-                <div class="error">{{ errors.general }}</div>
-              }
+                @if (errors.descripcion) {
+                  <div class="error">{{ errors.descripcion }}</div>
+                }
+
+                <mat-form-field appearance="outline" class="full">
+                  <mat-label>Estado</mat-label>
+
+                  <mat-select [(ngModel)]="form.estado" name="estado">
+                    <mat-option value="ACTIVO">Activo</mat-option>
+                    <mat-option value="INACTIVO">Inactivo</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                @if (errors.estado) {
+                  <div class="error">{{ errors.estado }}</div>
+                }
+
+                @if (errors.general) {
+                  <div class="error error--general">{{ errors.general }}</div>
+                }
+              </div>
 
               <div class="categories-form__actions">
-                <button mat-flat-button color="primary" type="button" (click)="save()">
+                <button mat-stroked-button type="button" (click)="goBack()">
+                  Cancelar
+                </button>
+
+                <button mat-flat-button type="button" (click)="save()">
+                  <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
                   {{ isEditMode ? 'Guardar cambios' : 'Crear categoría' }}
                 </button>
               </div>

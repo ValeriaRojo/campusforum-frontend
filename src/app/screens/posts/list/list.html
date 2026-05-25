@@ -25,7 +25,6 @@
       <mat-drawer-content class="posts-list__content">
         <div class="posts-list__main">
           <main class="posts-list__body">
-
             <section class="posts-list__hero">
               <div class="posts-list__hero-copy">
                 <span class="posts-list__eyebrow">CampusForum</span>
@@ -55,7 +54,7 @@
                   (ngModelChange)="onSearchChange()"
                   placeholder="Buscar por título, contenido o autor"
                   name="search"
-                >
+                />
                 <mat-icon matSuffix>search</mat-icon>
               </mat-form-field>
 
@@ -95,9 +94,10 @@
 
                       <h2 class="posts-list__card-title">{{ post.titulo }}</h2>
 
-                      <p class="posts-list__card-text">
-                        {{ post.contenido }}
-                      </p>
+                      <div
+                        class="posts-list__card-text posts-list__post-excerpt"
+                        [innerHTML]="post.contenido"
+                      ></div>
 
                       <div class="posts-list__meta">
                         <div class="posts-list__author">
@@ -189,7 +189,6 @@
                 </mat-card>
               </section>
             }
-
           </main>
 
           <app-footer></app-footer>
@@ -199,7 +198,6 @@
   } @else {
     <div class="posts-list__public">
       <main class="posts-list__body">
-
         <section class="posts-list__hero">
           <div class="posts-list__hero-copy">
             <span class="posts-list__eyebrow">CampusForum</span>
@@ -228,7 +226,7 @@
               (ngModelChange)="onSearchChange()"
               placeholder="Buscar por título, contenido o autor"
               name="search"
-            >
+            />
             <mat-icon matSuffix>search</mat-icon>
           </mat-form-field>
 
@@ -268,9 +266,10 @@
 
                   <h2 class="posts-list__card-title">{{ post.titulo }}</h2>
 
-                  <p class="posts-list__card-text">
-                    {{ post.contenido }}
-                  </p>
+                  <div
+                    class="posts-list__card-text posts-list__post-excerpt"
+                    [innerHTML]="post.contenido"
+                  ></div>
 
                   <div class="posts-list__meta">
                     <div class="posts-list__author">
@@ -316,7 +315,6 @@
             </mat-card>
           </section>
         }
-
       </main>
 
       <app-footer></app-footer>

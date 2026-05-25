@@ -66,7 +66,12 @@ export class ReportsList implements OnInit {
         return;
       }
 
-      this.reportsService.updateStatus(report.id, result.decision);
+this.reportsService.resolveReport(
+  report.id,
+  result.decision,
+  this.authService.getUserName() || 'Moderador',
+  result.note
+);
       this.loadReports();
     });
   }

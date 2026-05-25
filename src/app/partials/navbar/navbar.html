@@ -1,4 +1,8 @@
-<mat-toolbar color="primary" class="navbar px-4">
+<mat-toolbar
+  color="primary"
+  class="navbar px-4"
+  [class.navbar--public]="isPublic"
+>
   <section class="brand-container" aria-label="Barra principal">
     @if (isPrivate) {
       <button
@@ -13,7 +17,7 @@
     }
 
     @if (isPublic) {
-      <a
+      <button
         type="button"
         (click)="goToInicio()"
         class="brand-logo-link"
@@ -24,7 +28,7 @@
           alt="Logo CampusForum"
           class="brand-logo"
         />
-      </a>
+      </button>
     }
 
     <a
@@ -38,7 +42,9 @@
 
   @if (isPublic) {
     <section class="navbar__links">
-      <a mat-button type="button" (click)="goToInicio()">Inicio</a>
+      <button mat-button type="button" (click)="goToInicio()">
+        Inicio
+      </button>
 
       <button
         mat-button
@@ -83,7 +89,7 @@
         class="navbar-profile-btn"
         (click)="goToProfile()"
       >
-      <mat-icon>person_outlined</mat-icon>
+        <mat-icon>person_outlined</mat-icon>
         Perfil
       </button>
 
@@ -100,3 +106,7 @@
     </section>
   }
 </mat-toolbar>
+
+@if (isPublic) {
+  <div class="navbar-public-spacer" aria-hidden="true"></div>
+}

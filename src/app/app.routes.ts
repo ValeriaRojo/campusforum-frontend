@@ -25,37 +25,34 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
 
+  /* PÚBLICAS */
   {
     path: 'landing',
     component: Landing,
   },
-
   {
     path: 'login',
     component: Login,
   },
-
   {
     path: 'registro',
     component: Registro,
   },
+  {
+    path: 'posts',
+    component: PostsList,
+  },
 
+  /* AUTENTICADAS */
   {
     path: 'dashboard',
     component: Dashboard,
     canActivate: [AuthGuard],
   },
-
   {
     path: 'profile',
     component: Profile,
     canActivate: [AuthGuard],
-  },
-
-  /* POSTS */
-  {
-    path: 'posts',
-    component: PostsList,
   },
   {
     path: 'posts/form',
@@ -70,9 +67,10 @@ export const routes: Routes = [
   {
     path: 'posts/:id',
     component: PostsDetail,
+    canActivate: [AuthGuard], 
   },
 
-  /* CATEGORIES */
+  /* SOLO PROFESOR / ADMINISTRADOR */
   {
     path: 'categories',
     component: CategoriesList,
@@ -97,8 +95,6 @@ export const routes: Routes = [
       roles: ['PROFESOR', 'ADMINISTRADOR'],
     },
   },
-
-  /* REPORTS */
   {
     path: 'reports',
     component: ReportsList,

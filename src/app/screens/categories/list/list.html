@@ -25,27 +25,62 @@
       <div class="categories-list__main">
         <main class="categories-list__body">
           <section class="categories-list__hero">
-            <div>
-              <span class="categories-list__eyebrow">Catálogo</span>
+            <div class="categories-list__hero-copy">
+              <span class="categories-list__eyebrow">Catálogo académico</span>
               <h1 class="categories-list__title">Categorías</h1>
               <p class="categories-list__subtitle">
-                Administra las categorías académicas usadas por las publicaciones.
+                Administra las categorías académicas usadas para organizar las publicaciones.
               </p>
             </div>
 
-            <button mat-flat-button color="primary" type="button" (click)="goCreate()">
+            <button mat-flat-button type="button" (click)="goCreate()">
               <mat-icon>add</mat-icon>
               Nueva categoría
             </button>
           </section>
 
+          <section class="categories-list__kpis">
+            <mat-card class="categories-list__kpi">
+              <mat-card-content>
+                <span>Total</span>
+                <strong>{{ rows.length }}</strong>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="categories-list__kpi">
+              <mat-card-content>
+                <span>Activas</span>
+                <strong>{{ totalActivas }}</strong>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="categories-list__kpi">
+              <mat-card-content>
+                <span>Inactivas</span>
+                <strong>{{ totalInactivas }}</strong>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="categories-list__kpi">
+              <mat-card-content>
+                <span>Resultado</span>
+                <strong>{{ filteredRows.length }}</strong>
+              </mat-card-content>
+            </mat-card>
+          </section>
+
           <section class="categories-list__filters">
-            <mat-form-field appearance="outline" class="full">
+            <mat-form-field appearance="outline" class="categories-list__filter-search">
               <mat-label>Buscar</mat-label>
-              <input matInput [(ngModel)]="search" name="search" placeholder="Buscar por nombre o descripción">
+              <input
+                matInput
+                [(ngModel)]="search"
+                name="search"
+                placeholder="Buscar por nombre o descripción"
+              />
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full">
+            <mat-form-field appearance="outline">
               <mat-label>Estado</mat-label>
               <mat-select [(ngModel)]="estado" name="estado">
                 <mat-option value="TODAS">Todas</mat-option>
@@ -53,30 +88,83 @@
                 <mat-option value="INACTIVO">Inactivas</mat-option>
               </mat-select>
             </mat-form-field>
+
+            <button mat-stroked-button type="button" (click)="clearFilters()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Limpiar
+            </button>
           </section>
 
-          <section class="categories-list__grid">
-            @for (row of filteredRows; track row.id) {
-              <mat-card class="categories-list__card">
-                <mat-card-content>
-                  <div class="categories-list__top">
-                    <h3>{{ row.nombre }}</h3>
-                    <span class="categories-list__status" [class.is-inactive]="row.estado === 'INACTIVO'">
-                      {{ row.estado }}
-                    </span>
-                  </div>
+          <section class="categories-list__table">
+            <mat-card class="categories-list__table-card">
+              <mat-card-content>
+                <div class="categories-list__table-wrapper">
+                  <table class="categories-list__table-content">
+                    <thead>
+                      <tr>
+                        <th>Categoría</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
 
-                  <p class="categories-list__desc">{{ row.descripcion }}</p>
+                    <tbody>
+                      @for (row of filteredRows; track row.id) {
+                        <tr>
+                          <td class="categories-list__name-cell">
+                            {{ row.nombre }}
+                          </td>
 
-                  <div class="categories-list__actions">
-                    <button mat-stroked-button type="button" (click)="goEdit(row.id)">Editar</button>
-                    @if (row.estado === 'ACTIVO') {
-                      <button mat-stroked-button type="button" (click)="inactivate(row.id)">Inactivar</button>
-                    }
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            }
+                          <td>
+                            {{ row.descripcion }}
+                          </td>
+
+                          <td>
+                            <span
+                              class="categories-list__status"
+                              [class.active]="row.estado === 'ACTIVO'"
+                              [class.inactive]="row.estado === 'INACTIVO'"
+                            >
+                              {{ row.estado }}
+                            </span>
+                          </td>
+
+                          <td>
+                            <div class="categories-list__actions-col">
+                              <button mat-stroked-button type="button" (click)="goEdit(row.id)">
+                                <mat-icon>edit</mat-icon>
+                                Editar
+                              </button>
+
+                              @if (row.estado === 'ACTIVO') {
+                                <button mat-stroked-button type="button" (click)="inactivate(row.id)">
+                                  <mat-icon>visibility_off</mat-icon>
+                                  Inactivar
+                                </button>
+                              } @else {
+                                <button mat-stroked-button type="button" (click)="activate(row.id)">
+                                  <mat-icon>check_circle</mat-icon>
+                                  Activar
+                                </button>
+                              }
+                            </div>
+                          </td>
+                        </tr>
+                      } @empty {
+                        <tr>
+                          <td colspan="4">
+                            <div class="categories-list__empty">
+                              No se encontraron categorías con los filtros seleccionados.
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </mat-card-content>
+            </mat-card>
           </section>
         </main>
 

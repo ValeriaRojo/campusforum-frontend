@@ -345,7 +345,56 @@ export class PostsService {
 
     return { ok: true };
   }
+public updateComment(
+  postId: number,
+  commentId: number,
+  contenido: string
+): { ok: boolean; error?: string } {
+  const postIndex = this.posts.findIndex((item) => item.id === postId);
 
+  if (postIndex === -1) {
+    return {
+      ok: false,
+      error: 'La publicación no existe.',
+    };
+  }
+
+  const commentIndex = this.posts[postIndex].comentarios.findIndex(
+    (comment) => comment.id === commentId
+  );
+
+  if (commentIndex === -1) {
+    return {
+      ok: false,
+      error: 'El comentario no existe.',
+    };
+  }
+
+  const text = contenido.trim();
+
+  if (!text) {
+    return {
+      ok: false,
+      error: 'El comentario es obligatorio.',
+    };
+  }
+
+  if (text.length < 20) {
+    return {
+      ok: false,
+      error: 'El comentario debe tener al menos 20 caracteres.',
+    };
+  }
+
+  this.posts[postIndex].comentarios[commentIndex] = {
+    ...this.posts[postIndex].comentarios[commentIndex],
+    contenido: text,
+  };
+
+  return {
+    ok: true,
+  };
+}
   public deleteComment(postId: number, commentId: number): boolean {
     const postIndex = this.posts.findIndex((item) => item.id === postId);
 

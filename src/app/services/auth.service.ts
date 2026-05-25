@@ -14,11 +14,6 @@ interface LoginResponse {
   roles: string[];
 }
 
-interface StoredSession {
-  user: AuthUser;
-  token: string;
-}
-
 interface ProfileUpdateInput {
   firstName: string;
   lastName: string;
@@ -27,40 +22,37 @@ interface ProfileUpdateInput {
   avatar: string;
 }
 
-const SESSION_KEY = 'campusforum_session';
-
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private token: string | null = null;
+  private pendingRedirect: string = '/dashboard';
+
   private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
+
   public readonly currentUser$: Observable<AuthUser | null> =
     this.currentUserSubject.asObservable();
 
-  constructor(private readonly http: HttpClient) {
-    this.restoreSession();
+  constructor(private readonly http: HttpClient) {}
+
+  public setPendingRedirect(url: string | null): void {
+    if (url && url.startsWith('/') && !url.startsWith('//')) {
+      this.pendingRedirect = url;
+      return;
+    }
+
+    this.pendingRedirect = '/dashboard';
   }
 
-  private restoreSession(): void {
-    const stored = localStorage.getItem(SESSION_KEY);
-    if (stored) {
-      try {
-        const session: StoredSession = JSON.parse(stored);
-        this.currentUserSubject.next(session.user);
-      } catch {
-        localStorage.removeItem(SESSION_KEY);
-      }
-    }
+  public consumePendingRedirect(): string {
+    const redirect = this.pendingRedirect || '/dashboard';
+    this.pendingRedirect = '/dashboard';
+    return redirect;
   }
 
   public getToken(): string | null {
-    const stored = localStorage.getItem(SESSION_KEY);
-    if (!stored) return null;
-    try {
-      return (JSON.parse(stored) as StoredSession).token;
-    } catch {
-      return null;
-    }
+    return this.token;
   }
 
   public authenticate(
@@ -81,17 +73,25 @@ export class AuthService {
             role: this.mapRole(response.roles),
             avatar: 'assets/images/avatares/avatar-gorra-lentes.png',
           };
-          const session: StoredSession = { user, token: response.token };
-          localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+          this.token = response.token;
           this.currentUserSubject.next(user);
-          return { ok: true as const, user };
+
+          return {
+            ok: true as const,
+            user,
+          };
         }),
         catchError((err: HttpErrorResponse) => {
           const error =
-            err.status === 400
+            err.status === 400 || err.status === 401
               ? 'Correo o contraseña incorrectos.'
               : 'Error de conexión. Intenta más tarde.';
-          return of({ ok: false as const, error });
+
+          return of({
+            ok: false as const,
+            error,
+          });
         })
       );
   }
@@ -118,7 +118,11 @@ export class AuthService {
             err.status === 400
               ? 'Ese correo ya está registrado.'
               : 'Error al registrar. Intenta más tarde.';
-          return of({ ok: false as const, error });
+
+          return of({
+            ok: false as const,
+            error,
+          });
         })
       );
   }
@@ -128,14 +132,15 @@ export class AuthService {
   }
 
   public logout(): void {
-    const token = this.getToken();
-    if (token) {
+    if (this.token) {
       this.http.get(`${environment.url_api}/logout/`).subscribe({
         error: () => {},
       });
     }
-    localStorage.removeItem(SESSION_KEY);
+
+    this.token = null;
     this.currentUserSubject.next(null);
+    this.pendingRedirect = '/dashboard';
   }
 
   public getCurrentUser(): AuthUser | null {
@@ -143,7 +148,7 @@ export class AuthService {
   }
 
   public isAuthenticated(): boolean {
-    return this.getCurrentUser() !== null;
+    return this.getCurrentUser() !== null && this.token !== null;
   }
 
   public getUserRole(): UserRole | null {
@@ -186,7 +191,10 @@ export class AuthService {
     const currentUser = this.getCurrentUser();
 
     if (!currentUser) {
-      return { ok: false, error: 'No hay usuario autenticado.' };
+      return {
+        ok: false,
+        error: 'No hay usuario autenticado.',
+      };
     }
 
     const updatedUser: AuthUser = {
@@ -199,11 +207,6 @@ export class AuthService {
       avatar: input.avatar,
     };
 
-    const session: StoredSession = {
-      user: updatedUser,
-      token: this.getToken() ?? '',
-    };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     this.currentUserSubject.next(updatedUser);
 
     return { ok: true };
@@ -211,7 +214,11 @@ export class AuthService {
 
   public hasRole(roles: UserRole[]): boolean {
     const role = this.getUserRole();
-    if (!role) return false;
+
+    if (!role) {
+      return false;
+    }
+
     return roles.includes(role);
   }
 
@@ -228,8 +235,16 @@ export class AuthService {
   }
 
   private mapRole(roles: string[]): UserRole {
-    if (roles.includes('administrador')) return 'ADMINISTRADOR';
-    if (roles.includes('profesor')) return 'PROFESOR';
+    const normalizedRoles = roles.map((role) => role.trim().toLowerCase());
+
+    if (normalizedRoles.includes('administrador')) {
+      return 'ADMINISTRADOR';
+    }
+
+    if (normalizedRoles.includes('profesor')) {
+      return 'PROFESOR';
+    }
+
     return 'ESTUDIANTE';
   }
 }

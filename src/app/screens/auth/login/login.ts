@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -21,7 +21,7 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements OnInit {
   public username: string = '';
   public password: string = '';
 
@@ -43,6 +43,11 @@ export class Login {
     private readonly authService: AuthService,
   ) {}
 
+  ngOnInit(): void {
+    const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
+    this.authService.setPendingRedirect(redirectTo);
+  }
+
   public setFocus(field: '' | 'email' | 'password'): void {
     this.focusedField = field;
   }
@@ -60,6 +65,7 @@ export class Login {
     }
 
     this.isLoading = true;
+
     this.authService.authenticate(this.username, this.password).subscribe((authResult) => {
       this.isLoading = false;
 
@@ -68,13 +74,17 @@ export class Login {
         return;
       }
 
-      const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
-      this.router.navigateByUrl(redirectTo || '/dashboard');
+      const redirectTo = this.authService.consumePendingRedirect();
+      this.router.navigateByUrl(redirectTo);
     });
   }
 
   public goRegistro(): void {
-    this.router.navigate(['/registro']);
+    const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
+
+    this.router.navigate(['/registro'], {
+      queryParams: redirectTo ? { redirectTo } : {},
+    });
   }
 
   public recuperarPwd(): void {

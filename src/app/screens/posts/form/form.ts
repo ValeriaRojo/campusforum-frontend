@@ -26,7 +26,6 @@ import { UserRole } from '../../../models/auth-user.model';
   styleUrls: ['./form.scss'],
 })
 export class PostsForm implements OnInit {
-
   public drawerOpen: boolean = false;
   public isLogin: boolean = false;
   public userRole: UserRole = 'ESTUDIANTE';
@@ -50,6 +49,7 @@ export class PostsForm implements OnInit {
   }
 
   ngOnInit(): void {
+    this.cargarContenidoEditor();
     this.syncAuthState();
     this.categorias = this.postsService.getCategories();
 
@@ -77,6 +77,7 @@ export class PostsForm implements OnInit {
       etiquetas: foundPost.etiquetas,
       estado: foundPost.estado,
     };
+    this.cargarContenidoEditor();
   }
 
   public toggleSidebar(): void {
@@ -96,6 +97,62 @@ export class PostsForm implements OnInit {
     this.router.navigate(['/posts']);
   }
 
+public aplicarFormato(tipo: 'bold' | 'italic' | 'list' | 'link' | 'code'): void {
+  const editor = document.querySelector('.posts-form__rich-editor') as HTMLElement | null;
+
+  if (!editor) {
+    return;
+  }
+
+  editor.focus();
+
+  if (tipo === 'bold') {
+    document.execCommand('bold');
+  }
+
+  if (tipo === 'italic') {
+    document.execCommand('italic');
+  }
+
+  if (tipo === 'list') {
+    document.execCommand('insertUnorderedList');
+  }
+
+  if (tipo === 'link') {
+    const url = prompt('Ingresa la URL del enlace');
+
+    if (url) {
+      document.execCommand('createLink', false, url);
+    }
+  }
+
+  if (tipo === 'code') {
+    document.execCommand('formatBlock', false, 'pre');
+  }
+
+  this.sincronizarContenidoEditor();
+}
+
+public sincronizarContenidoEditor(): void {
+  const editor = document.querySelector('.posts-form__rich-editor') as HTMLElement | null;
+
+  if (!editor) {
+    return;
+  }
+
+  this.post.contenido = editor.innerHTML.trim();
+  this.errors.contenido = undefined;
+}
+
+public cargarContenidoEditor(): void {
+  setTimeout(() => {
+    const editor = document.querySelector('.posts-form__rich-editor') as HTMLElement | null;
+
+    if (editor) {
+      editor.innerHTML = this.post.contenido || '';
+    }
+  });
+}
   public guardar(): void {
     this.errors = this.postsService.validarPost(this.post);
 

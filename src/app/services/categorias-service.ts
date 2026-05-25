@@ -3,6 +3,7 @@ import {
   CategoryErrors,
   CategoryForm,
   CategoryItem,
+  CategoryStatus,
 } from '../shared/interfaces/categories.interface';
 
 @Injectable({
@@ -10,11 +11,36 @@ import {
 })
 export class CategoriesService {
   private categories: CategoryItem[] = [
-    { id: 1, nombre: 'Programación', descripcion: 'Desarrollo, frontend, backend y buenas prácticas.', estado: 'ACTIVO' },
-    { id: 2, nombre: 'Matemáticas', descripcion: 'Álgebra, cálculo, probabilidad y apoyo teórico.', estado: 'ACTIVO' },
-    { id: 3, nombre: 'Inteligencia Artificial', descripcion: 'ML, DL, clasificación y aplicaciones.', estado: 'ACTIVO' },
-    { id: 4, nombre: 'Bases de Datos', descripcion: 'Modelado, SQL, normalización y administración.', estado: 'ACTIVO' },
-    { id: 5, nombre: 'Redes', descripcion: 'Subnetting, VLANs, switching y routing.', estado: 'ACTIVO' },
+    {
+      id: 1,
+      nombre: 'Programación',
+      descripcion: 'Desarrollo, frontend, backend y buenas prácticas.',
+      estado: 'ACTIVO',
+    },
+    {
+      id: 2,
+      nombre: 'Matemáticas',
+      descripcion: 'Álgebra, cálculo, probabilidad y apoyo teórico.',
+      estado: 'ACTIVO',
+    },
+    {
+      id: 3,
+      nombre: 'Inteligencia Artificial',
+      descripcion: 'Machine learning, deep learning y aplicaciones académicas.',
+      estado: 'ACTIVO',
+    },
+    {
+      id: 4,
+      nombre: 'Bases de Datos',
+      descripcion: 'Modelado, SQL, normalización y administración de datos.',
+      estado: 'ACTIVO',
+    },
+    {
+      id: 5,
+      nombre: 'Redes',
+      descripcion: 'Subnetting, VLANs, switching, routing y conectividad.',
+      estado: 'ACTIVO',
+    },
   ];
 
   public esquemaCategoria(): CategoryForm {
@@ -27,12 +53,15 @@ export class CategoriesService {
   }
 
   public getAllCategories(includeInactive = true): CategoryItem[] {
-    const rows = includeInactive ? this.categories : this.categories.filter(c => c.estado === 'ACTIVO');
+    const rows = includeInactive
+      ? this.categories
+      : this.categories.filter((category) => category.estado === 'ACTIVO');
+
     return [...rows].sort((a, b) => a.nombre.localeCompare(b.nombre));
   }
 
   public getCategoryById(id: number): CategoryItem | null {
-    const found = this.categories.find(c => c.id === id);
+    const found = this.categories.find((category) => category.id === id);
     return found ? { ...found } : null;
   }
 
@@ -49,8 +78,11 @@ export class CategoriesService {
       errors.nombre = 'El nombre no puede exceder 80 caracteres.';
     } else {
       const duplicate = this.categories.find(
-        c => c.nombre.trim().toLowerCase() === nombre.toLowerCase() && c.id !== existingId
+        (category) =>
+          category.nombre.trim().toLowerCase() === nombre.toLowerCase() &&
+          category.id !== existingId
       );
+
       if (duplicate) {
         errors.nombre = 'Ya existe una categoría con ese nombre.';
       }
@@ -65,56 +97,90 @@ export class CategoriesService {
     }
 
     if (form.estado !== 'ACTIVO' && form.estado !== 'INACTIVO') {
-      errors.estado = 'Debes seleccionar un estado válido.';
+      errors.estado = 'Selecciona un estado válido.';
     }
 
     return errors;
   }
 
-  public createCategory(form: CategoryForm): { ok: true; id: number } | { ok: false; errors: CategoryErrors } {
+  public createCategory(
+    form: CategoryForm
+  ): { ok: true; id: number } | { ok: false; errors: CategoryErrors } {
     const errors = this.validarCategoria(form);
+
     if (Object.keys(errors).length > 0) {
       return { ok: false, errors };
     }
 
-    const id = this.categories.length ? Math.max(...this.categories.map(c => c.id)) + 1 : 1;
+    const id = this.generateId();
+
     this.categories.push({
       id,
       nombre: form.nombre.trim(),
       descripcion: form.descripcion.trim(),
-      estado: form.estado as 'ACTIVO' | 'INACTIVO',
+      estado: form.estado as CategoryStatus,
     });
 
     return { ok: true, id };
   }
 
-  public updateCategory(id: number, form: CategoryForm): { ok: true } | { ok: false; errors: CategoryErrors } {
-    const idx = this.categories.findIndex(c => c.id === id);
-    if (idx === -1) {
-      return { ok: false, errors: { general: 'Categoría no encontrada.' } };
+  public updateCategory(
+    id: number,
+    form: CategoryForm
+  ): { ok: true } | { ok: false; errors: CategoryErrors } {
+    const index = this.categories.findIndex((category) => category.id === id);
+
+    if (index === -1) {
+      return {
+        ok: false,
+        errors: {
+          general: 'Categoría no encontrada.',
+        },
+      };
     }
 
     const errors = this.validarCategoria(form, id);
+
     if (Object.keys(errors).length > 0) {
       return { ok: false, errors };
     }
 
-    this.categories[idx] = {
+    this.categories[index] = {
       id,
       nombre: form.nombre.trim(),
       descripcion: form.descripcion.trim(),
-      estado: form.estado as 'ACTIVO' | 'INACTIVO',
+      estado: form.estado as CategoryStatus,
     };
 
     return { ok: true };
   }
 
+  public activateCategory(id: number): boolean {
+    return this.changeStatus(id, 'ACTIVO');
+  }
+
   public inactivateCategory(id: number): boolean {
-    const idx = this.categories.findIndex(c => c.id === id);
-    if (idx === -1) {
+    return this.changeStatus(id, 'INACTIVO');
+  }
+
+  private changeStatus(id: number, estado: CategoryStatus): boolean {
+    const index = this.categories.findIndex((category) => category.id === id);
+
+    if (index === -1) {
       return false;
     }
-    this.categories[idx] = { ...this.categories[idx], estado: 'INACTIVO' };
+
+    this.categories[index] = {
+      ...this.categories[index],
+      estado,
+    };
+
     return true;
+  }
+
+  private generateId(): number {
+    return this.categories.length
+      ? Math.max(...this.categories.map((category) => category.id)) + 1
+      : 1;
   }
 }

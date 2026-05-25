@@ -26,7 +26,7 @@ import { ReportCommentModal } from '../../../modals/report-comment-modal/report-
     ...SHARED_IMPORTS,
     Navbar,
     Sidebar,
-    Footer
+    Footer,
   ],
   templateUrl: './detail.html',
   styleUrls: ['./detail.scss'],
@@ -40,8 +40,13 @@ export class PostsDetail implements OnInit {
   public postId: number = 0;
   public post: PostDetailItem | null = null;
   public categoriaNombre: string = '';
+
   public newComment: string = '';
   public commentError: string = '';
+
+  public editingCommentId: number | null = null;
+  public editingCommentText: string = '';
+  public editingCommentError: string = '';
 
   public categories: CategoryItem[] = [];
 
@@ -58,10 +63,15 @@ export class PostsDetail implements OnInit {
     this.syncAuthState();
     this.categories = this.postsService.getCategories();
 
-    const idParam = this.route.snapshot.paramMap.get('id');
-    this.postId = Number(idParam ?? 0);
+const idParam = this.route.snapshot.paramMap.get('id');
+this.postId = Number(idParam);
 
-    this.loadPost();
+if (!idParam || Number.isNaN(this.postId) || this.postId <= 0) {
+  this.router.navigate(['/posts']);
+  return;
+}
+
+this.loadPost();
   }
 
   public toggleSidebar(): void {
@@ -76,6 +86,12 @@ export class PostsDetail implements OnInit {
     this.router.navigate(['/posts']);
   }
 
+  public goLogin(): void {
+    this.router.navigate(['/login'], {
+      queryParams: { redirectTo: `/posts/${this.postId}` },
+    });
+  }
+
   public goEditPost(): void {
     if (!this.post || !this.canEditCurrentPost) {
       return;
@@ -86,6 +102,11 @@ export class PostsDetail implements OnInit {
 
   public addComment(): void {
     this.commentError = '';
+
+    if (!this.isLogin) {
+      this.goLogin();
+      return;
+    }
 
     const result = this.postsService.addComment(
       this.postId,
@@ -99,6 +120,44 @@ export class PostsDetail implements OnInit {
     }
 
     this.newComment = '';
+    this.loadPost();
+  }
+
+  public startEditComment(comment: CommentItem): void {
+    if (!this.canEditComment(comment)) {
+      return;
+    }
+
+    this.editingCommentId = comment.id;
+    this.editingCommentText = comment.contenido;
+    this.editingCommentError = '';
+  }
+
+  public cancelEditComment(): void {
+    this.editingCommentId = null;
+    this.editingCommentText = '';
+    this.editingCommentError = '';
+  }
+
+  public saveEditedComment(comment: CommentItem): void {
+    this.editingCommentError = '';
+
+    if (!this.canEditComment(comment)) {
+      return;
+    }
+
+    const result = this.postsService.updateComment(
+      this.postId,
+      comment.id,
+      this.editingCommentText
+    );
+
+    if (!result.ok) {
+      this.editingCommentError = result.error ?? 'No se pudo actualizar el comentario.';
+      return;
+    }
+
+    this.cancelEditComment();
     this.loadPost();
   }
 
@@ -119,17 +178,17 @@ export class PostsDetail implements OnInit {
         return;
       }
 
-this.reportsService.createReport(
-  {
-    tipo: 'POST',
-    referenciaId: this.post.id,
-    postId: this.post.id,
-    motivo: result.motivo,
-    descripcion: this.post.titulo,
-    estado: 'PENDIENTE',
-  },
-  this.currentUserName || 'Usuario'
-);
+      this.reportsService.createReport(
+        {
+          tipo: 'POST',
+          referenciaId: this.post.id,
+          postId: this.post.id,
+          motivo: result.motivo,
+          descripcion: this.post.titulo,
+          estado: 'PENDIENTE',
+        },
+        this.currentUserName || 'Usuario'
+      );
     });
   }
 
@@ -151,17 +210,17 @@ this.reportsService.createReport(
         return;
       }
 
-this.reportsService.createReport(
-  {
-    tipo: 'COMENTARIO',
-    referenciaId: comment.id,
-    postId: this.post.id,
-    motivo: result.motivo,
-    descripcion: comment.contenido,
-    estado: 'PENDIENTE',
-  },
-  this.currentUserName || 'Usuario'
-);
+      this.reportsService.createReport(
+        {
+          tipo: 'COMENTARIO',
+          referenciaId: comment.id,
+          postId: this.post.id,
+          motivo: result.motivo,
+          descripcion: comment.contenido,
+          estado: 'PENDIENTE',
+        },
+        this.currentUserName || 'Usuario'
+      );
     });
   }
 
@@ -181,6 +240,7 @@ this.reportsService.createReport(
     ref.afterClosed().subscribe((confirmed) => {
       if (confirmed) {
         this.postsService.deleteComment(this.postId, comment.id);
+        this.cancelEditComment();
         this.loadPost();
       }
     });
@@ -248,6 +308,10 @@ this.reportsService.createReport(
 
   public canDeleteComment(comment: CommentItem): boolean {
     return this.canManagePosts || this.isCommentOwner(comment);
+  }
+
+  public canEditComment(comment: CommentItem): boolean {
+    return this.isCommentOwner(comment);
   }
 
   public get canEditCurrentPost(): boolean {

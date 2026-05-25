@@ -212,3 +212,20 @@
     justify-content: center;
   }
 }
+
+.categories-list__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 24px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e8eef7;
+  color: #23415f;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  margin-bottom: 12px;
+}
