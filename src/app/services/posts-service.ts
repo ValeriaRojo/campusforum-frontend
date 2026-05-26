@@ -272,7 +272,7 @@ export class PostsService {
 
   public createPostApi(post: any): Observable<any> {
     return this.http.post(this.apiUrl, post);
-  } 
+  }
 
   public getPostsApi(): Observable<any> {
     return this.http.get(this.apiUrl);

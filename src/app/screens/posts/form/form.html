@@ -1,4 +1,5 @@
 <section class="posts-form">
+
   <app-navbar
     mode="private"
     [userRole]="userRole"
@@ -7,6 +8,7 @@
   ></app-navbar>
 
   <mat-drawer-container class="posts-form__drawer-container" autosize>
+
     <mat-drawer
       class="posts-form__drawer"
       mode="over"
@@ -22,8 +24,11 @@
     </mat-drawer>
 
     <mat-drawer-content class="posts-form__content">
+
       <div class="posts-form__main">
+
         <main class="posts-form__body">
+
           <section class="posts-form__hero">
             <div>
               <span class="posts-form__eyebrow">Publicaciones</span>
@@ -33,7 +38,7 @@
               </h1>
 
               <p class="posts-form__subtitle">
-                Comparte ideas, preguntas y conocimiento con la comunidad académica.
+                Comparte ideas, preguntas y conocimiento con la comunidad.
               </p>
             </div>
 
@@ -45,7 +50,9 @@
 
           <mat-card class="posts-form__card">
             <mat-card-content>
+
               <div class="posts-form__grid">
+
                 <mat-form-field appearance="outline" class="full">
                   <mat-label>Título</mat-label>
                   <input
@@ -54,7 +61,7 @@
                     name="titulo"
                     maxlength="120"
                     placeholder="Escribe el título de tu publicación"
-                  />
+                  >
                 </mat-form-field>
 
                 @if (errors.titulo) {
@@ -64,7 +71,10 @@
                 <mat-form-field appearance="outline" class="full">
                   <mat-label>Categoría</mat-label>
 
-                  <mat-select [(ngModel)]="post.categoriaId" name="categoriaId">
+                  <mat-select
+                    [(ngModel)]="post.categoriaId"
+                    name="categoriaId"
+                  >
                     @for (item of categorias; track item.id) {
                       <mat-option [value]="item.id">
                         {{ item.nombre }}
@@ -78,14 +88,13 @@
                 }
 
                 <mat-form-field appearance="outline" class="full">
-                  <mat-label>Etiquetas opcionales</mat-label>
+                  <mat-label>Etiquetas (opcional)</mat-label>
                   <input
                     matInput
                     [(ngModel)]="post.etiquetas"
                     name="etiquetas"
-                    maxlength="100"
                     placeholder="angular, mysql, backend"
-                  />
+                  >
                 </mat-form-field>
 
                 @if (errors.etiquetas) {
@@ -95,7 +104,10 @@
                 <mat-form-field appearance="outline" class="full">
                   <mat-label>Estado</mat-label>
 
-                  <mat-select [(ngModel)]="post.estado" name="estado">
+                  <mat-select
+                    [(ngModel)]="post.estado"
+                    name="estado"
+                  >
                     <mat-option value="PUBLICADO">Publicado</mat-option>
                     <mat-option value="BORRADOR">Borrador</mat-option>
                     <mat-option value="ARCHIVADO">Archivado</mat-option>
@@ -106,59 +118,22 @@
                   <div class="error">{{ errors.estado }}</div>
                 }
 
-                <section class="posts-form__editor">
-                  <div class="posts-form__editor-head">
-                    <div>
-                      <h2>Contenido</h2>
-                      <p>
-                        Selecciona texto dentro del editor y aplica formato visual.
-                      </p>
-                    </div>
+                <mat-form-field appearance="outline" class="full">
+                  <mat-label>Contenido</mat-label>
 
-                    <span>{{ post.contenido.length || 0 }}/2500</span>
-                  </div>
+                  <textarea
+                    matInput
+                    rows="10"
+                    [(ngModel)]="post.contenido"
+                    name="contenido"
+                    placeholder="Escribe el contenido de la publicación"
+                  ></textarea>
+                </mat-form-field>
 
-                  <div class="posts-form__toolbar" aria-label="Herramientas de formato">
-                    <button mat-stroked-button type="button" (click)="aplicarFormato('bold')">
-                      <mat-icon>format_bold</mat-icon>
-                      Negritas
-                    </button>
+                @if (errors.contenido) {
+                  <div class="error">{{ errors.contenido }}</div>
+                }
 
-                    <button mat-stroked-button type="button" (click)="aplicarFormato('italic')">
-                      <mat-icon>format_italic</mat-icon>
-                      Cursiva
-                    </button>
-
-                    <button mat-stroked-button type="button" (click)="aplicarFormato('list')">
-                      <mat-icon>format_list_bulleted</mat-icon>
-                      Lista
-                    </button>
-
-                    <button mat-stroked-button type="button" (click)="aplicarFormato('link')">
-                      <mat-icon>link</mat-icon>
-                      Enlace
-                    </button>
-
-                    <button mat-stroked-button type="button" (click)="aplicarFormato('code')">
-                      <mat-icon>code</mat-icon>
-                      Código
-                    </button>
-                  </div>
-
-                  <div
-                    class="posts-form__rich-editor"
-                    contenteditable="true"
-                    role="textbox"
-                    aria-label="Contenido de la publicación"
-                    data-placeholder="Escribe el contenido de la publicación"
-                    (input)="sincronizarContenidoEditor()"
-                    (blur)="sincronizarContenidoEditor()"
-                  ></div>
-
-                  @if (errors.contenido) {
-                    <div class="error">{{ errors.contenido }}</div>
-                  }
-                </section>
               </div>
 
               <div class="posts-form__actions">
@@ -167,16 +142,21 @@
                 </button>
 
                 <button mat-flat-button color="primary" type="button" (click)="guardar()">
-                  <mat-icon>{{ isEditMode ? 'save' : 'send' }}</mat-icon>
                   {{ isEditMode ? 'Guardar cambios' : 'Publicar' }}
                 </button>
               </div>
+
             </mat-card-content>
           </mat-card>
+
         </main>
 
         <app-footer></app-footer>
+
       </div>
+
     </mat-drawer-content>
+
   </mat-drawer-container>
+
 </section>
