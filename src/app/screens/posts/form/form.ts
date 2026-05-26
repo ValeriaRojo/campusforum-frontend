@@ -26,7 +26,6 @@ import { UserRole } from '../../../models/auth-user.model';
   styleUrls: ['./form.scss'],
 })
 export class PostsForm implements OnInit {
-
   public drawerOpen: boolean = false;
   public isLogin: boolean = false;
   public userRole: UserRole = 'ESTUDIANTE';
@@ -50,6 +49,7 @@ export class PostsForm implements OnInit {
   }
 
   ngOnInit(): void {
+    this.cargarContenidoEditor();
     this.syncAuthState();
     this.categorias = this.postsService.getCategories();
 
@@ -62,31 +62,22 @@ export class PostsForm implements OnInit {
     this.isEditMode = true;
     this.postId = Number(idParam);
 
-    this.postsService.getPostByIdApi(this.postId)
-    .subscribe({
+    const foundPost = this.postsService.getPostById(this.postId);
 
-      next: (foundPost) => {
+    if (!foundPost) {
+      this.router.navigate(['/posts']);
+      return;
+    }
 
-        this.post = {
-          id: foundPost.id,
-          titulo: foundPost.title,
-          contenido: foundPost.content,
-          categoriaId: foundPost.categoria?.id ?? null,
-          etiquetas: foundPost.etiquetas,
-          estado: foundPost.estado,
-        };
-
-      },
-
-      error: (error) => {
-
-        console.error(error);
-
-        this.router.navigate(['/posts']);
-
-      }
-
-    });
+    this.post = {
+      id: foundPost.id,
+      titulo: foundPost.titulo,
+      contenido: foundPost.contenido,
+      categoriaId: foundPost.categoriaId,
+      etiquetas: foundPost.etiquetas,
+      estado: foundPost.estado,
+    };
+    this.cargarContenidoEditor();
   }
 
   public toggleSidebar(): void {
@@ -106,6 +97,62 @@ export class PostsForm implements OnInit {
     this.router.navigate(['/posts']);
   }
 
+public aplicarFormato(tipo: 'bold' | 'italic' | 'list' | 'link' | 'code'): void {
+  const editor = document.querySelector('.posts-form__rich-editor') as HTMLElement | null;
+
+  if (!editor) {
+    return;
+  }
+
+  editor.focus();
+
+  if (tipo === 'bold') {
+    document.execCommand('bold');
+  }
+
+  if (tipo === 'italic') {
+    document.execCommand('italic');
+  }
+
+  if (tipo === 'list') {
+    document.execCommand('insertUnorderedList');
+  }
+
+  if (tipo === 'link') {
+    const url = prompt('Ingresa la URL del enlace');
+
+    if (url) {
+      document.execCommand('createLink', false, url);
+    }
+  }
+
+  if (tipo === 'code') {
+    document.execCommand('formatBlock', false, 'pre');
+  }
+
+  this.sincronizarContenidoEditor();
+}
+
+public sincronizarContenidoEditor(): void {
+  const editor = document.querySelector('.posts-form__rich-editor') as HTMLElement | null;
+
+  if (!editor) {
+    return;
+  }
+
+  this.post.contenido = editor.innerHTML.trim();
+  this.errors.contenido = undefined;
+}
+
+public cargarContenidoEditor(): void {
+  setTimeout(() => {
+    const editor = document.querySelector('.posts-form__rich-editor') as HTMLElement | null;
+
+    if (editor) {
+      editor.innerHTML = this.post.contenido || '';
+    }
+  });
+}
   public guardar(): void {
     this.errors = this.postsService.validarPost(this.post);
 
@@ -114,65 +161,25 @@ export class PostsForm implements OnInit {
     }
 
     if (this.isEditMode && this.postId) {
+      const result = this.postsService.updatePost(this.postId, this.post);
 
-      const backendPayload = {
-        title: this.post.titulo.trim(),
-        content: this.post.contenido.trim(),
-        categoria_id: this.post.categoriaId,
-        etiquetas: this.post.etiquetas ?? '',
-        estado: this.post.estado ?? 'PUBLICADO',
-        author_id: Number(this.authService.getUserId()),
-      };
+      if (!result.ok && result.errors) {
+        this.errors = result.errors;
+        return;
+      }
 
-      this.postsService.updatePostApi(this.postId, backendPayload)
-      .subscribe({
-        next: (response) => {
-
-            console.log('POST ACTUALIZADO');
-            console.log(response);
-
-            this.router.navigate(['/posts', this.postId]);
-        },
-        error: (error) => {
-            console.error('ERROR actualizando post:', error);
-            console.error(error.error);
-            alert('Hubo un error al actualizar el post. Por favor, intenta nuevamente =(.');
-        }
-      });
+      this.router.navigate(['/posts', this.postId]);
       return;
     }
 
-    const userId = this.authService.getUserId();
+    const result = this.postsService.createPost(this.post, this.currentUserName);
 
-    console.log('USER ID:', userId);
-    console.log('TIPO:', typeof userId);
+    if (!result.ok && result.errors) {
+      this.errors = result.errors;
+      return;
+    }
 
-    const backendPayload = {
-      title: this.post.titulo.trim(),
-      content: this.post.contenido.trim(),
-      categoria_id: this.post.categoriaId,
-      etiquetas: this.post.etiquetas ?? '',
-      estado: this.post.estado ?? 'PUBLICADO',
-      author_id: Number(userId),
-    };
-
-    console.log('Payload:', backendPayload);
-
-    this.postsService.createPostApi(backendPayload)
-      .subscribe({
-        next: (response) => {
-
-            console.log('POST EXITOSO');
-            console.log('Post creado:', response);
-            this.router.navigate(['/posts']);
-        },
-
-        error: (error) => {
-            console.error('ERROR creando post:', error);
-            console.error(error.error);
-            alert('Hubo un error al crear el post. Por favor, intenta nuevamente =(.');
-        }
-      });
+    this.router.navigate(['/posts', result.postId]);
   }
 
   public limpiar(): void {
